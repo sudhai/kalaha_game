@@ -29,8 +29,8 @@ public class GamePit implements Serializable {
     public void clear (){
         this.stones = 0;
     }
-    public void addStones (){
-        this.stones++;
+    public void addStones (Integer stone){
+        this.stones += stone;
     }
     @JsonIgnore
     public boolean isEmpty(){

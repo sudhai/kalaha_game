@@ -21,7 +21,7 @@ public class GameExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(KalahaBadRequestException.class)
-    public ResponseEntity<?> badRequestException(ResourceNotFoundException ex) {
+    public ResponseEntity<?> badRequestException(KalahaBadRequestException ex) {
         ErrorDetails errorDetails = new ErrorDetails(HttpStatus.BAD_REQUEST, LocalDateTime.now(), ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }

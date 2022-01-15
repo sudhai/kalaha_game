@@ -5,7 +5,7 @@ import com.test.kalahagame.exception.ResourceNotFoundException;
 
 public interface KalahaService {
 
-    public Integer createGame();
+    public KalahaGame createGame();
 
     KalahaGame getGame(Integer gameId) throws ResourceNotFoundException;
 

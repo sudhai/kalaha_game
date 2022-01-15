@@ -18,12 +18,12 @@ public class KalahaGameController {
     KalahaService service;
 
     @PostMapping(value = "/createGame")
-    public ResponseEntity<Integer> createGame(){
+    public ResponseEntity<KalahaGame> createGame(){
         log.info("Create game method controller called");
-        Integer gameId = service.createGame();
-        log.info("Created game with id "+gameId);
+        KalahaGame game = service.createGame();
+        log.info("Created game with id "+game.getGameId());
 
-        return ResponseEntity.ok(gameId);
+        return ResponseEntity.ok(game);
 
     }
 
@@ -38,7 +38,7 @@ public class KalahaGameController {
                                                @ApiParam(value = "Pit id or index should be between 1-6 or 8-13",required = true)
                                                @PathVariable(value = "pitId")Integer pitId) throws Exception {
 
-        log.info("playGame service is called for gameId "+gameId +" and pit id "+pitId);
+        log.info("playGame controller for gameId "+gameId +" and pit id "+pitId);
         if(pitId < 1 || pitId.equals(7) || pitId.equals(14)){
             throw new KalahaException("Invalid pit index. Pit id or index should be between 1-6 or 8-13");
         }

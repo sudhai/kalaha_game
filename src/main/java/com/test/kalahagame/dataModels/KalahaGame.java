@@ -1,6 +1,6 @@
 package com.test.kalahagame.dataModels;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.test.kalahagame.exception.KalahaBadRequestException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.test.kalahagame.constants.GameConstants.DEFAULT_STONES;
 
 @Getter
 @Setter
@@ -20,23 +22,22 @@ public class KalahaGame implements Serializable {
 
     @Id
     @Column
-    private Integer id;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "gameId")
-    private List<GamePit> pits;
+    private Integer gameId;
 
     private Player playersTurn;
 
-//    @JsonIgnore
-//    private int currentPitIndex;
+    private String gameStatus;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id")
+    private List<GamePit> pits;
 
     public KalahaGame(){
-        this(6);
+        this(DEFAULT_STONES);
     }
 
     public KalahaGame(int stones){
-        this.id = count.incrementAndGet();
+        this.gameId = count.incrementAndGet();
         List<GamePit> pit = new ArrayList<>();
         pit.add(new GamePit(1,stones));
         pit.add(new GamePit(2,stones));
@@ -59,9 +60,12 @@ public class KalahaGame implements Serializable {
         try {
             return this.pits.get(pitId - 1);
         }catch (Exception e){
-            //throw new exception
-            throw new RuntimeException("Invalid Pit ID");
+            throw new KalahaBadRequestException("Invalid Pit ID");
         }
+    }
+    public boolean isAllNonHousePitsEmpty(){
+
+        return this.pits.stream().filter(pit -> pit.getPitId() != 7 || pit.getPitId() != 14).allMatch(GamePit::isEmpty);
     }
 
 }
