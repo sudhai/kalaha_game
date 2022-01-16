@@ -114,9 +114,11 @@ public class KalahaServiceImpl implements KalahaService{
               don't add stone in the opposite player's house pit
              */
                 if ((pitId == PLAYER_A_HOUSE_PIT && game.getPlayersTurn() != PLAYER_A) || (pitId == PLAYER_B_HOUSE_PIT && game.getPlayersTurn() != PLAYER_B)) {
-                    if (i == stonesInPit) {
-                        allPits.get(pitId == 13 ? 0 : pitId + 1).addStones(1);
-                    }
+//                    if (i == stonesInPit) {
+                    pitId = pitId == 13 ? 0 : pitId + 1;
+                        allPits.get(pitId).addStones(1);
+
+                  //  }
                     continue;
                 }
 

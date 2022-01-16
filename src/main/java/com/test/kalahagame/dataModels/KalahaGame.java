@@ -1,5 +1,6 @@
 package com.test.kalahagame.dataModels;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.test.kalahagame.exception.KalahaBadRequestException;
 import lombok.Getter;
 import lombok.Setter;
@@ -63,6 +64,7 @@ public class KalahaGame implements Serializable {
             throw new KalahaBadRequestException("Invalid Pit ID");
         }
     }
+    @JsonIgnore
     public boolean isAllNonHousePitsEmpty(){
 
         return this.pits.stream().filter(pit -> pit.getPitId() != 7 || pit.getPitId() != 14).allMatch(GamePit::isEmpty);

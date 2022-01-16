@@ -33,7 +33,7 @@ public class KalahaGameController {
         return ResponseEntity.ok(service.getGame(gameId));
     }
 
-    @PutMapping(value = "/playGame/{gameId}/{pitId}")
+    @PostMapping(value = "/playGame/{gameId}/{pitId}")
     public ResponseEntity<KalahaGame> playGame(@ApiParam(required = true) @PathVariable(value = "gameId")Integer gameId,
                                                @ApiParam(value = "Pit id or index should be between 1-6 or 8-13",required = true)
                                                @PathVariable(value = "pitId")Integer pitId) throws Exception {
