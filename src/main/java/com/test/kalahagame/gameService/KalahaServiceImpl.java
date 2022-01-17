@@ -95,7 +95,7 @@ public class KalahaServiceImpl implements KalahaService{
                             int stonesInOppPit = game.getPitDetailsById(oppositePitIndex).getStones();
                             int housePitIndex = game.getPlayersTurn() == PLAYER_A ? PLAYER_A_HOUSE_PIT : PLAYER_B_HOUSE_PIT;
                             allPits.get(housePitIndex).addStones(stonesInOppPit + 1);
-                            allPits.get(oppositePitIndex).clear();
+                            allPits.get(oppositePitIndex -1).clear();
                             break;
                         }
                     }
@@ -114,11 +114,8 @@ public class KalahaServiceImpl implements KalahaService{
               don't add stone in the opposite player's house pit
              */
                 if ((pitId == PLAYER_A_HOUSE_PIT && game.getPlayersTurn() != PLAYER_A) || (pitId == PLAYER_B_HOUSE_PIT && game.getPlayersTurn() != PLAYER_B)) {
-//                    if (i == stonesInPit) {
-                    pitId = pitId == 13 ? 0 : pitId + 1;
-                        allPits.get(pitId).addStones(1);
-
-                  //  }
+                    i = i-1;
+                    pitId++;
                     continue;
                 }
 
