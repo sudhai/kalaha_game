@@ -1,5 +1,6 @@
 package com.test.kalahagame.exception;
 
+import com.test.kalahagame.dataModels.ErrorDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
-public class GameExceptionHandler {
+public class KalahaGameExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> globalExcpetionHandler(Exception ex) {
@@ -24,5 +25,10 @@ public class GameExceptionHandler {
     public ResponseEntity<?> badRequestException(KalahaBadRequestException ex) {
         ErrorDetails errorDetails = new ErrorDetails(HttpStatus.BAD_REQUEST, LocalDateTime.now(), ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(GameEndException.class)
+    public ResponseEntity<?> gameEndException(GameEndException ex) {
+        ErrorDetails errorDetails = new ErrorDetails(HttpStatus.CONFLICT, LocalDateTime.now(), ex.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
 }

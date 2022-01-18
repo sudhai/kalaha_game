@@ -1,4 +1,4 @@
-package com.test.kalahagame.exception;
+package com.test.kalahagame.dataModels;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

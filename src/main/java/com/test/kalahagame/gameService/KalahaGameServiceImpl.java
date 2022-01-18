@@ -1,11 +1,11 @@
 package com.test.kalahagame.gameService;
 
-import com.test.kalahagame.dataModels.GamePit;
+import com.test.kalahagame.dataModels.KalahaPit;
 import com.test.kalahagame.dataModels.KalahaGame;
+import com.test.kalahagame.exception.GameEndException;
 import com.test.kalahagame.exception.KalahaBadRequestException;
-import com.test.kalahagame.exception.KalahaException;
 import com.test.kalahagame.exception.ResourceNotFoundException;
-import com.test.kalahagame.repository.GameRepository;
+import com.test.kalahagame.repository.KalahaGameRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,10 +19,10 @@ import static com.test.kalahagame.dataModels.Player.PLAYER_B;
 
 @Service
 @Slf4j
-public class KalahaServiceImpl implements KalahaService{
+public class KalahaGameServiceImpl implements KalahaGameService {
 
     @Autowired
-    GameRepository repository;
+    KalahaGameRepository repository;
 
     private final String statusGame = "Game is In progress";
 
@@ -39,7 +39,7 @@ public class KalahaServiceImpl implements KalahaService{
     }
 
     @Override
-    public KalahaGame getGame(Integer gameId) throws ResourceNotFoundException {
+    public KalahaGame getGame(Integer gameId) {
         log.info("get game service called");
         Optional<KalahaGame> result = repository.findById(gameId);
         if(result.isEmpty())
@@ -49,7 +49,7 @@ public class KalahaServiceImpl implements KalahaService{
     }
 
     @Override
-    public KalahaGame playGame(Integer gameId, Integer pitId) throws Exception {
+    public KalahaGame playGame(Integer gameId, Integer pitId) {
 
         log.info("play game service call started");
         KalahaGame game = getGame(gameId);
@@ -64,16 +64,16 @@ public class KalahaServiceImpl implements KalahaService{
             }
 
             //Get Pit details - stones in the pit
-            GamePit selectedPit = game.getPitDetailsById(pitId);
+            KalahaPit selectedPit = game.getPitDetailsById(pitId);
 
             Integer stonesInPit = selectedPit.getStones();
 
             if (stonesInPit == 0) {
-                throw new KalahaException("No stones in the pid. Please select different Pid.");
+                throw new KalahaBadRequestException("No stones in the pid. Please select different Pid.");
             }
 
 
-            List<GamePit> allPits = game.getPits();
+            List<KalahaPit> allPits = game.getPits();
             allPits.get(pitId - 1).clear();
 
             boolean houseIndex = false;
@@ -89,7 +89,7 @@ public class KalahaServiceImpl implements KalahaService{
                         isNextPidIdSelf = true;
 
                     if (isNextPidIdSelf) {
-                        GamePit nextPit = game.getPitDetailsById(nextPitId);
+                        KalahaPit nextPit = game.getPitDetailsById(nextPitId);
                         if (nextPit.isEmpty()) {
                             int oppositePitIndex = TOTAL_PITS - nextPitId;
                             int stonesInOppPit = game.getPitDetailsById(oppositePitIndex).getStones();
@@ -137,29 +137,58 @@ public class KalahaServiceImpl implements KalahaService{
             if (!houseIndex)
                 game.setPlayersTurn(game.getPlayersTurn() == PLAYER_A ? PLAYER_B : PLAYER_A);
 
-            if (game.isAllNonHousePitsEmpty()) {
-                Integer playerAStones = allPits.get(PLAYER_A_HOUSE_PIT).getStones();
-                Integer playerBStones = allPits.get(PLAYER_B_HOUSE_PIT).getStones();
-
-                switch (playerAStones.compareTo(playerBStones)) {
-                    case 0:
-                        game.setGameStatus("game is DRAW");
-                        break;
-                    case -1:
-                        game.setGameStatus("Player A wins");
-                        break;
-                    case 1:
-                        game.setGameStatus("Player B wins");
-                        break;
-                }
-
+            if(checkGameOver(game)){
+                checkWinner(game);
             }
 
             repository.save(game);
+        }else{
+            throw new GameEndException(game.getGameId()+" : This game is not in progress. Game status : "+game.getGameStatus());
         }
         log.info("play game service called ended");
 
         return game;
     }
 
+    /**
+     * Sets winner for the game by comparing the total number of stones in each player's house pit
+     * @param game
+     */
+
+    private void checkWinner(KalahaGame game) {
+
+        Integer playerAStones = game.getPits().get(PLAYER_A_HOUSE_PIT).getStones();
+        Integer playerBStones = game.getPits().get(PLAYER_B_HOUSE_PIT).getStones();
+
+        switch (playerAStones.compareTo(playerBStones)) {
+            case 0:
+                game.setGameStatus("game is DRAW");
+                break;
+            case -1:
+                game.setGameStatus("Player B wins");
+                break;
+            case 1:
+                game.setGameStatus("Player A wins");
+                break;
+        }
+
+
+    }
+
+    /**
+     * To check if the game is over
+     * @param game
+     * @return true if any Player's pits are empty and other player's remaining stones are added to the house pit
+     */
+
+    private boolean checkGameOver(KalahaGame game){
+        if(game.checkPlayersNonHousePitsEmpty(PLAYER_A.getId()) || game.checkPlayersNonHousePitsEmpty(PLAYER_A.getId())){
+
+            game.addAllStonesToHouseIndex(PLAYER_A.getId());
+            game.addAllStonesToHouseIndex(PLAYER_B.getId());
+            game.getPits().stream().filter(x -> x.getPitId() != 7 && x.getPitId() != 14).forEach(KalahaPit::clear);
+            return true;
+        }
+        return false;
+    }
 }

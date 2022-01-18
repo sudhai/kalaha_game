@@ -17,7 +17,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class GamePit implements Serializable {
+public class KalahaPit implements Serializable {
 
     @Id
     @Column
