@@ -44,7 +44,7 @@ public class KalahaGameServiceTest {
         game.setPlayersTurn(PLAYER_A);
         game.setGameStatus("Game is In progress");
 
-        when(repository.findById(1)).thenReturn(Optional.ofNullable(game));
+        when(repository.findById(1)).thenReturn(Optional.of(game));
         service.getGame(1);
 
         verify(repository).findById(1);

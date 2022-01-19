@@ -20,7 +20,7 @@ public class KalahaGameController {
     @Autowired
     KalahaGameService service;
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<KalahaGame> createGame(){
         log.info("Create game method controller called");
         KalahaGame game = service.createGame();
